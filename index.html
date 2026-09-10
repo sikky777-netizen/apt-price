@@ -1,1 +1,662 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101d3a">
 
+  <title>전국 아파트 시세</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Pretendard",
+                   "Noto Sans KR", Arial, sans-serif;
+      background: #f5f7fb;
+      color: #182033;
+    }
+
+    header {
+      background: #101d3a;
+      color: white;
+      padding: 18px 20px;
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .logo span {
+      color: #e5bd67;
+    }
+
+    .header-desc {
+      font-size: 13px;
+      color: #c8cfdf;
+    }
+
+    .hero {
+      background:
+        linear-gradient(135deg, #101d3a 0%, #19315d 100%);
+      color: white;
+      padding: 55px 20px 90px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 36px;
+      margin-bottom: 12px;
+      letter-spacing: -1.5px;
+    }
+
+    .hero p {
+      color: #d6dcea;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: -50px auto 60px;
+      padding: 0 18px;
+    }
+
+    .search-box {
+      background: white;
+      border-radius: 22px;
+      padding: 28px;
+      box-shadow: 0 15px 45px rgba(22, 34, 61, 0.12);
+    }
+
+    .search-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .search-sub {
+      font-size: 14px;
+      color: #777f90;
+      margin-bottom: 24px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    select,
+    input {
+      width: 100%;
+      height: 52px;
+      border: 1px solid #dfe3eb;
+      border-radius: 12px;
+      padding: 0 14px;
+      font-size: 15px;
+      background: white;
+      outline: none;
+    }
+
+    select:focus,
+    input:focus {
+      border-color: #203c70;
+      box-shadow: 0 0 0 3px rgba(32, 60, 112, 0.08);
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    .search-btn {
+      width: 100%;
+      height: 54px;
+      border: 0;
+      border-radius: 13px;
+      background: #101d3a;
+      color: white;
+      font-size: 17px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 5px;
+      transition: 0.2s;
+    }
+
+    .search-btn:hover {
+      background: #1c3260;
+      transform: translateY(-1px);
+    }
+
+    .quick-title {
+      font-size: 16px;
+      font-weight: 800;
+      margin: 28px 0 14px;
+    }
+
+    .quick-list {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .quick-btn {
+      background: #f4f6fa;
+      border: 1px solid #eaedf2;
+      border-radius: 10px;
+      height: 42px;
+      cursor: pointer;
+      font-size: 14px;
+      color: #30394b;
+    }
+
+    .quick-btn:hover {
+      background: #e9eef8;
+    }
+
+    .section-title {
+      margin: 34px 0 15px;
+      font-size: 19px;
+      font-weight: 800;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .info-card {
+      background: white;
+      border-radius: 16px;
+      padding: 22px 18px;
+      border: 1px solid #e8ebf1;
+    }
+
+    .info-icon {
+      font-size: 25px;
+      margin-bottom: 12px;
+    }
+
+    .info-card h3 {
+      font-size: 16px;
+      margin-bottom: 7px;
+    }
+
+    .info-card p {
+      color: #7a8292;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    #result {
+      display: none;
+      margin-top: 20px;
+      background: white;
+      border-radius: 18px;
+      border: 1px solid #e1e5ec;
+      padding: 24px;
+    }
+
+    .result-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .result-name {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .result-label {
+      background: #fff4d6;
+      color: #8a651f;
+      padding: 7px 11px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .price {
+      font-size: 32px;
+      font-weight: 900;
+      color: #142950;
+      margin: 8px 0;
+    }
+
+    .price-note {
+      color: #7a8292;
+      font-size: 13px;
+    }
+
+    footer {
+      text-align: center;
+      color: #999faa;
+      font-size: 12px;
+      padding: 30px 20px 45px;
+    }
+
+    @media (max-width: 650px) {
+
+      .header-desc {
+        display: none;
+      }
+
+      .hero {
+        padding: 45px 18px 80px;
+      }
+
+      .hero h1 {
+        font-size: 29px;
+      }
+
+      .hero p {
+        font-size: 14px;
+      }
+
+      .search-box {
+        padding: 22px 18px;
+        border-radius: 18px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .full {
+        grid-column: auto;
+      }
+
+      .quick-list {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .price {
+        font-size: 27px;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-inner">
+
+    <div class="logo">
+      APT <span>PRICE</span>
+    </div>
+
+    <div class="header-desc">
+      전국 아파트 실거래 기반 시세분석
+    </div>
+
+  </div>
+</header>
+
+
+<section class="hero">
+
+  <h1>우리 아파트, 지금 얼마일까?</h1>
+
+  <p>
+    전국 아파트 실거래 데이터를 분석하여<br>
+    현재 가격과 시장 흐름을 한눈에 확인하세요.
+  </p>
+
+</section>
+
+
+<main class="container">
+
+  <div class="search-box">
+
+    <div class="search-title">
+      아파트 시세 조회
+    </div>
+
+    <div class="search-sub">
+      지역과 아파트를 선택해 주세요.
+    </div>
+
+
+    <div class="form-grid">
+
+      <select id="sido" onchange="changeSido()">
+
+        <option value="">시·도 선택</option>
+        <option value="서울">서울특별시</option>
+        <option value="경기">경기도</option>
+        <option value="인천">인천광역시</option>
+        <option value="부산">부산광역시</option>
+        <option value="대구">대구광역시</option>
+        <option value="대전">대전광역시</option>
+        <option value="광주">광주광역시</option>
+        <option value="울산">울산광역시</option>
+        <option value="세종">세종특별자치시</option>
+        <option value="강원">강원특별자치도</option>
+        <option value="충북">충청북도</option>
+        <option value="충남">충청남도</option>
+        <option value="전북">전북특별자치도</option>
+        <option value="전남">전라남도</option>
+        <option value="경북">경상북도</option>
+        <option value="경남">경상남도</option>
+        <option value="제주">제주특별자치도</option>
+
+      </select>
+
+
+      <select id="sigungu">
+
+        <option value="">
+          시·군·구 선택
+        </option>
+
+      </select>
+
+
+      <input
+        class="full"
+        id="aptName"
+        type="text"
+        placeholder="아파트 이름을 입력하세요"
+      >
+
+
+      <button
+        class="search-btn full"
+        onclick="searchApartment()"
+      >
+        🔍 시세 조회하기
+      </button>
+
+    </div>
+
+
+    <div class="quick-title">
+      빠른 지역 선택
+    </div>
+
+    <div class="quick-list">
+
+      <button class="quick-btn" onclick="quickRegion('서울')">
+        서울
+      </button>
+
+      <button class="quick-btn" onclick="quickRegion('경기')">
+        경기
+      </button>
+
+      <button class="quick-btn" onclick="quickRegion('인천')">
+        인천
+      </button>
+
+      <button class="quick-btn" onclick="quickRegion('부산')">
+        부산
+      </button>
+
+    </div>
+
+
+    <div id="result">
+
+      <div class="result-top">
+
+        <div class="result-name" id="resultName">
+          아파트
+        </div>
+
+        <div class="result-label">
+          실거래 기반
+        </div>
+
+      </div>
+
+      <div>
+        예상 시세
+      </div>
+
+      <div class="price">
+        API 연결 준비중
+      </div>
+
+      <div class="price-note">
+        다음 단계에서 국토교통부 실거래가 API를 연결합니다.
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="section-title">
+    제공 예정 분석
+  </div>
+
+
+  <div class="info-grid">
+
+    <div class="info-card">
+
+      <div class="info-icon">
+        🏢
+      </div>
+
+      <h3>
+        최근 실거래
+      </h3>
+
+      <p>
+        동일 단지와 동일 면적의 최근 거래가격을
+        자동으로 분석합니다.
+      </p>
+
+    </div>
+
+
+    <div class="info-card">
+
+      <div class="info-icon">
+        📈
+      </div>
+
+      <h3>
+        가격 추세
+      </h3>
+
+      <p>
+        3개월·6개월·1년 가격 변화를 그래프로
+        확인할 수 있습니다.
+      </p>
+
+    </div>
+
+
+    <div class="info-card">
+
+      <div class="info-icon">
+        💰
+      </div>
+
+      <h3>
+        예상 시세
+      </h3>
+
+      <p>
+        최근 거래와 가격 흐름을 바탕으로
+        적정 가격 범위를 계산합니다.
+      </p>
+
+    </div>
+
+  </div>
+
+</main>
+
+
+<footer>
+  실거래 자료를 기반으로 제공되는 참고용 정보입니다.
+</footer>
+
+
+<script>
+
+const regions = {
+
+  서울: [
+    "강남구","강동구","강북구","강서구",
+    "관악구","광진구","구로구","금천구",
+    "노원구","도봉구","동대문구","동작구",
+    "마포구","서대문구","서초구","성동구",
+    "성북구","송파구","양천구","영등포구",
+    "용산구","은평구","종로구","중구","중랑구"
+  ],
+
+  경기: [
+    "수원시","성남시","고양시","용인시",
+    "부천시","안산시","안양시","남양주시",
+    "화성시","평택시","의정부시","시흥시",
+    "파주시","김포시","광명시","광주시",
+    "군포시","이천시","오산시","하남시",
+    "양주시","구리시","안성시","포천시",
+    "의왕시","여주시","동두천시","과천시"
+  ],
+
+  인천: [
+    "중구","동구","미추홀구","연수구",
+    "남동구","부평구","계양구","서구",
+    "강화군","옹진군"
+  ],
+
+  부산: [
+    "중구","서구","동구","영도구",
+    "부산진구","동래구","남구","북구",
+    "해운대구","사하구","금정구","강서구",
+    "연제구","수영구","사상구","기장군"
+  ]
+
+};
+
+
+function changeSido() {
+
+  const sido =
+    document.getElementById("sido").value;
+
+  const sigungu =
+    document.getElementById("sigungu");
+
+  sigungu.innerHTML =
+    '<option value="">시·군·구 선택</option>';
+
+
+  if (regions[sido]) {
+
+    regions[sido].forEach(region => {
+
+      const option =
+        document.createElement("option");
+
+      option.value = region;
+      option.textContent = region;
+
+      sigungu.appendChild(option);
+
+    });
+
+  }
+
+}
+
+
+function quickRegion(region) {
+
+  document.getElementById("sido").value =
+    region;
+
+  changeSido();
+
+}
+
+
+function searchApartment() {
+
+  const sido =
+    document.getElementById("sido").value;
+
+  const sigungu =
+    document.getElementById("sigungu").value;
+
+  const apt =
+    document.getElementById("aptName").value.trim();
+
+
+  if (!sido) {
+
+    alert("시·도를 선택해 주세요.");
+
+    return;
+  }
+
+
+  if (!sigungu) {
+
+    alert("시·군·구를 선택해 주세요.");
+
+    return;
+  }
+
+
+  if (!apt) {
+
+    alert("아파트 이름을 입력해 주세요.");
+
+    return;
+  }
+
+
+  document.getElementById("resultName").innerText =
+    sido + " " +
+    sigungu + " " +
+    apt;
+
+
+  document.getElementById("result").style.display =
+    "block";
+
+
+  document.getElementById("result")
+    .scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+
+}
+
+</script>
+
+
+</body>
+</html>
